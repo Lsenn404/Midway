@@ -19,7 +19,7 @@ const googleApi = {
 
     const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       coords.lat
-    },${coords.lng}&radius=${radius}&keyword=${keyword}&key=${
+    },${coords.lng}&radius=${radius*1000}&keyword=${keyword}&key=${
       import.meta.env.VITE_APIKEY
     }`;
 

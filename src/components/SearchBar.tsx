@@ -17,7 +17,7 @@ export default function MidwaySearchBars() {
   const [firstAddressSet, setFirstAddressSet] = useState<boolean>(false);
   const [secondAddressSet, setSecondAddressSet] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>("");
-  const [radius, setRadius] = useState<number>(1);
+  const [radius, setRadius] = useState<number>();
   const [encodedPolylineValue, setEncodedPolylineValue] = useState<string>("");
   const [midwayCoords, setMidwayCoords] = useState<any>([]);
 
@@ -126,7 +126,7 @@ export default function MidwaySearchBars() {
       let userParams = {
         type: "",
         keyword: keyword,
-        radius: radius * 1000,
+        radius: radius,
         coordinate: { lng: midwayCoords[0], lat: midwayCoords[1] },
         useNextPage: false,
       };
@@ -144,9 +144,9 @@ export default function MidwaySearchBars() {
 
     return (
       <div>
-        <form className="px-4 form">
+        <form className="px-4 my-2 form">
           <input
-            className="font-fuzzy-bubbles w-1/6 h-12 text-2xl py-1 pl-3 pr-2 text-gray-500 border rounded-md outline-none bg-gray-50 focus:bg-white focus:border-indigo-600"
+            className="font-fuzzy-bubbles flex-grow px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800"
             value={radius}
             name="radius"
             onChange={handleSetUserParams}
@@ -154,7 +154,7 @@ export default function MidwaySearchBars() {
             placeholder="radius (km)"
           />
           <input
-            className="font-fuzzy-bubbles w-1/6 h-12 text-2xl py-1 pl-3 pr-2 text-gray-500 border rounded-md outline-none bg-gray-50 focus:bg-white focus:border-indigo-600"
+            className="font-fuzzy-bubbles flex-grow px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800"
             value={keyword}
             name="keyword"
             onChange={handleSetUserParams}
@@ -162,7 +162,7 @@ export default function MidwaySearchBars() {
             placeholder="keyword"
           />
           <button
-            className="font-fuzzy-bubbles w-1/12 h-12 text-2xl bg-white text-gray-600 py-auto rounded-lg mt-2 transition-all ease-out duration-300 hover:scale-110 hover:bg-black hover:bg-opacity-10 ml-2"
+            className="font-fuzzy-bubbles px-4 py-2 my-0 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
             onClick={handleFormSubmit}
           >
             submit
@@ -173,9 +173,9 @@ export default function MidwaySearchBars() {
   }
 
   return (
-    <div>
-      <form className="px-4 form">
-        
+    <>
+      <div>
+        <form className="px-4 form">
           <div className="flex items-center justify-center my-2">
             <input
               className="font-fuzzy-bubbles flex-grow px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800"
@@ -186,7 +186,7 @@ export default function MidwaySearchBars() {
               placeholder="Enter address #1"
             />
             <button
-              className="font-fuzzy-bubbles px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+              className="font-fuzzy-bubbles px-4 py-2 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleFirstFormSubmit}
             >
               Submit
@@ -203,24 +203,24 @@ export default function MidwaySearchBars() {
               placeholder="Enter address #2"
             />
             <button
-              className="font-fuzzy-bubbles px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+              className="font-fuzzy-bubbles px-4 py-2 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleSecondFormSubmit}
             >
               Submit
             </button>
             {secondAddressSet ? <Checkmark></Checkmark> : null}
           </div>
-          <div>
-            <button
-              className="font-fuzzy-bubbles px-4 py-2 my-0 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+          <div className="flex items-center justify-center my-2">
+            {!firstAddressSet || !secondAddressSet ? <button
+              className="font-fuzzy-bubbles w-full px-4 py-2 my-0 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleDirections}
             >
               Confirm Addresses
-            </button>
+            </button> : null}
           </div>
-        
-      </form>
-      <div>{firstAddressSet && secondAddressSet ? midwayParams() : null}</div>
-    </div>
+        </form>
+      </div>
+      {firstAddressSet && secondAddressSet ? midwayParams() : null}
+    </>
   );
 }

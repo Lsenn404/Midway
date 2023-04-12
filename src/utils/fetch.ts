@@ -7,6 +7,7 @@ const googleApi = {
 
     const res = await fetch(searchUrl);
     const data = await res.json();
+    console.log(data, "LOGGING DATA")
     return data;
   },
 

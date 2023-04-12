@@ -1,7 +1,7 @@
 import { useAtom } from "jotai";
 import { midwayFirstAtom, midwaySecondAtom } from "../state";
 import { post } from "../api";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Checkmark from "./Checkmark";
 import googleApi from "../utils/fetch";
 
@@ -14,8 +14,8 @@ export default function MidwaySearchBars() {
   const [firstAddress, setFirstAddress] = useState<string>("");
   const [secondAddress, setSecondAddress] = useState<string>("");
 
-  const [firstAddressSet, setFirstAddressSet] = useState<boolean>(false);
-  const [secondAddressSet, setSecondAddressSet] = useState<boolean>(false);
+  const [firstAddressValid, setfirstAddressValid] = useState<boolean>(false);
+  const [secondAddressValid, setsecondAddressValid] = useState<boolean>(false);
   const [confirmed, setConfirmed] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>("");
   const [radius, setRadius] = useState<number>();
@@ -30,30 +30,24 @@ export default function MidwaySearchBars() {
     setSecondAddress(event.target.value);
   };
 
-  const handleFirstFormSubmit = (event: any) => {
+  const handleFirstFormSubmit = async (event: any) => {
     event.preventDefault();
-    getMidwayCoords(firstAddress, true).then((result) => {
-      if (result.validAddress === false) {
-        console.log("getMidwayCoords returned false");
-        return;
-      }
-      setFirstAddressSet(true);
-      console.log(result, "FIRSTFORMSUBMIT");
-      console.log(midwayFirst, "MIDWAYFIRST");
-    });
+    let res = await getMidwayCoords(firstAddress, true);
+    if (!res) {
+      //handle what to do if there is no result
+      return;
+    }
   };
 
-  const handleSecondFormSubmit = (event: any) => {
+  const handleSecondFormSubmit = async (event: any) => {
     event.preventDefault();
-    getMidwayCoords(secondAddress, false).then((result) => {
-      if (result.validAddress === false) {
-        console.log("getMidwayCoords returned false");
-        return;
-      }
-      setSecondAddressSet(true);
-      console.log(result, "SECONDFORMSUBMIT");
-      console.log(midwaySecond, "MIDWAYSECOND");
-    });
+    const res = await getMidwayCoords(secondAddress, false);
+    if (!res) {
+      //handle what to do if there is no result
+      return;
+    }
+
+    //handle what to do once you got geocoding result
   };
 
   const handleDirections = (event: any) => {
@@ -95,18 +89,25 @@ export default function MidwaySearchBars() {
 
   //will set the first or second atom depending on the boolean
   async function getMidwayCoords(userAddress: string, firstSecond: boolean) {
-    const addressData = await googleApi.search(userAddress);
-    console.log(addressData, "ADDRESS DATA");
+    const result = await googleApi.search(userAddress);
+    console.log(result.status, "RESULT");
+    if (result.status === "ZERO_RESULTS") {
+      console.log("ZERO RESULTS");
+      return false;
+    } else if (result.status === "INVALID_REQUEST") {
+      console.log("INVALID_REQUEST");
+      return false;
+    }
 
-    // if (!addressData.validAddress) {
-    //   console.log("that is not a valid address");
-    //   return addressData;
-    // }
-
-    // firstSecond
-    //   ? setMidwayFirst(addressData.newAddress)
-    //   : setMidwaySecond(addressData.newAddress);
-    return addressData;
+    if (firstSecond) {
+      setMidwayFirst(result.results[0]);
+      setfirstAddressValid(true);
+    } else {
+      setMidwaySecond(result.results[0]);
+      setsecondAddressValid(true);
+    }
+    console.log(result.results, "result.results");
+    return result.results;
   }
 
   function midwayParams() {
@@ -193,7 +194,7 @@ export default function MidwaySearchBars() {
             >
               Submit
             </button>
-            {firstAddressSet ? <Checkmark></Checkmark> : null}
+            {firstAddressValid ? <Checkmark></Checkmark> : null}
           </div>
           <div className="flex items-center justify-center my-2">
             <input
@@ -210,10 +211,10 @@ export default function MidwaySearchBars() {
             >
               Submit
             </button>
-            {secondAddressSet ? <Checkmark></Checkmark> : null}
+            {secondAddressValid ? <Checkmark></Checkmark> : null}
           </div>
           <div className="flex items-center justify-center my-2">
-            {firstAddressSet && secondAddressSet ? (
+            {firstAddressValid && secondAddressValid ? (
               <button
                 className="font-fuzzy-bubbles px-4 py-2 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
                 onClick={handleDirections}

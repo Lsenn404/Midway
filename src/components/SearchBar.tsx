@@ -2,6 +2,8 @@ import { useAtom } from "jotai";
 import { midwayFirstAtom, midwaySecondAtom } from "../state";
 import { post } from "../api";
 import { useState } from "react";
+import Checkmark from "./Checkmark";
+import googleApi from "../utils/fetch";
 
 //@ts-ignore
 import polyline from "@mapbox/polyline";
@@ -91,15 +93,17 @@ export default function MidwaySearchBars() {
 
   //will set the first or second atom depending on the boolean
   async function getMidwayCoords(userAddress: string, firstSecond: boolean) {
-    const addressData = await post("/api/address/search", { userAddress });
-    if (!addressData.validAddress) {
-      console.log("that is not a valid address");
-      return addressData;
-    }
+    const addressData = await googleApi.search(userAddress);
+    console.log(addressData, "ADDRESS DATA");
 
-    firstSecond
-      ? setMidwayFirst(addressData.newAddress)
-      : setMidwaySecond(addressData.newAddress);
+    // if (!addressData.validAddress) {
+    //   console.log("that is not a valid address");
+    //   return addressData;
+    // }
+
+    // firstSecond
+    //   ? setMidwayFirst(addressData.newAddress)
+    //   : setMidwaySecond(addressData.newAddress);
     return addressData;
   }
 
@@ -171,10 +175,10 @@ export default function MidwaySearchBars() {
   return (
     <div>
       <form className="px-4 form">
-        <div className="inline">
-          <div>
+        
+          <div className="flex items-center justify-center my-2">
             <input
-              className="font-fuzzy-bubbles w-1/3 h-12 text-2xl py-1 pl-3 pr-2 text-gray-500 border rounded-md outline-none bg-gray-50 focus:bg-white focus:border-indigo-600"
+              className="font-fuzzy-bubbles flex-grow px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800"
               value={firstAddress}
               name="firstAddress"
               onChange={handleSetFirstAddress}
@@ -182,15 +186,16 @@ export default function MidwaySearchBars() {
               placeholder="Enter address #1"
             />
             <button
-              className="font-fuzzy-bubbles w-1/12 h-12 text-2xl bg-white text-gray-600 py-auto rounded-lg mt-2 transition-all ease-out duration-300 hover:scale-110 hover:bg-black hover:bg-opacity-10 ml-2"
+              className="font-fuzzy-bubbles px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleFirstFormSubmit}
             >
-              submit
+              Submit
             </button>
+            {firstAddressSet ? <Checkmark></Checkmark> : null}
           </div>
-          <div>
+          <div className="flex items-center justify-center my-2">
             <input
-              className="font-fuzzy-bubbles w-1/3 h-12 text-2xl py-1 pl-3 pr-2 text-gray-500 border rounded-md outline-none bg-gray-50 focus:bg-white focus:border-indigo-600"
+              className="font-fuzzy-bubbles flex-grow px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800"
               value={secondAddress}
               name="secondAddress"
               onChange={handleSetSecondAddress}
@@ -198,21 +203,22 @@ export default function MidwaySearchBars() {
               placeholder="Enter address #2"
             />
             <button
-              className="font-fuzzy-bubbles w-1/12 h-12 text-2xl bg-white text-gray-600 py-auto rounded-lg mt-2 transition-all ease-out duration-300 hover:scale-110 hover:bg-black hover:bg-opacity-10 ml-2"
+              className="font-fuzzy-bubbles px-4 py-2 ml-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleSecondFormSubmit}
             >
-              submit
+              Submit
             </button>
+            {secondAddressSet ? <Checkmark></Checkmark> : null}
           </div>
           <div>
             <button
-              className="font-fuzzy-bubbles w-1/12 h-12 text-2xl bg-white text-gray-600 py-auto rounded-lg mt-2 transition-all ease-out duration-300 hover:scale-110 hover:bg-black hover:bg-opacity-10 ml-2"
+              className="font-fuzzy-bubbles px-4 py-2 my-0 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
               onClick={handleDirections}
             >
               Confirm Addresses
             </button>
           </div>
-        </div>
+        
       </form>
       <div>{firstAddressSet && secondAddressSet ? midwayParams() : null}</div>
     </div>

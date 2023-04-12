@@ -7,7 +7,7 @@ const googleApi = {
 
     const res = await fetch(searchUrl);
     const data = await res.json();
-    console.log(data, "LOGGING DATA")
+    console.log(data, "LOGGING DATA");
     return data;
   },
 
@@ -20,12 +20,26 @@ const googleApi = {
 
     const nearbyUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${
       coords.lat
-    },${coords.lng}&radius=${radius*1000}&keyword=${keyword}&key=${
+    },${coords.lng}&radius=${radius * 1000}&keyword=${keyword}&key=${
       import.meta.env.VITE_APIKEY
     }`;
 
     const res = await fetch(nearbyUrl);
     const data = await res.json();
+    return data;
+  },
+
+  directions: async (originID: string, destinationID: string) => {
+    const directionsUrl = `https://maps.googleapis.com/maps/api/directions/json?origin=place_id:${originID}&destination=place_id:${destinationID}&key=${
+      import.meta.env.VITE_APIKEY
+    }`;
+
+    console.log(directionsUrl, "DIRECTIONS URL");
+    const res = await fetch(directionsUrl);
+
+    console.log(res, "RES DIRECTIONS");
+    const data = await res.json();
+    console.log(data, "LOGGING DATA DIIIIIRECTIONS");
     return data;
   },
 };

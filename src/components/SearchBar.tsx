@@ -50,42 +50,49 @@ export default function MidwaySearchBars() {
     //handle what to do once you got geocoding result
   };
 
-  const handleDirections = (event: any) => {
+  const handleDirections = async (event: any) => {
     event.preventDefault();
-    console.log("handleDirections");
-    getDirections(midwayFirst.place_id, midwaySecond.place_id)
-      .then((result) => {
-        console.log(result, "HANDLE DIRECTIONS");
-        console.log(encodedPolylineValue, "ENCODED POLYLINE VALUE");
-        const decodedPolyline = polyline.toGeoJSON(encodedPolylineValue);
-        console.log(decodedPolyline, "DECODED POLYLINE");
-        let middleIndex = Math.floor(decodedPolyline.coordinates.length / 2);
-        console.log(middleIndex, "MIDDLE INDEX");
-        setMidwayCoords(decodedPolyline.coordinates[middleIndex]);
-      })
-      .then(() => {
-        console.log(midwayCoords, "MIDWAY COORDS");
-        setConfirmed(true);
-      });
+
+    //prevents making the call before having 2 valid addresses
+    if (!firstAddressValid || !secondAddressValid) {
+      return;
+    }
+    console.log(midwayFirst.place_id, midwaySecond.place_id);
+    const res = await googleApi.directions(
+      midwayFirst.place_id,
+      midwaySecond.place_id
+    );
+
+    console.log(res, "HANDLE DIRECTIONS");
+    const encodedPolyline = res.routes[0].overview_polyline.points;
+
+    const decodedPolyline = polyline.toGeoJSON(encodedPolyline);
+    console.log(decodedPolyline, "DECODED POLYLINE");
+    let middleIndex = Math.floor(decodedPolyline.coordinates.length / 2);
+    console.log(middleIndex, "MIDDLE INDEX");
+    setMidwayCoords(decodedPolyline.coordinates[middleIndex]);
+
+    console.log(midwayCoords, "MIDWAY COORDS");
+    // setConfirmed(true);
   };
 
-  async function getDirections(
-    originIDValue: string,
-    destinationIDValue: string
-  ) {
-    try {
-      const directionsData = await post("/api/address/directions", {
-        originIDValue,
-        destinationIDValue,
-      });
-      setEncodedPolylineValue(
-        directionsData.data.routes[0].overview_polyline.points
-      );
-      return directionsData;
-    } catch (err) {
-      console.log(err);
-    }
-  }
+  // async function getDirections(
+  //   originIDValue: string,
+  //   destinationIDValue: string
+  // ) {
+  //   try {
+  //     const directionsData = await post("/api/address/directions", {
+  //       originIDValue,
+  //       destinationIDValue,
+  //     });
+  //     setEncodedPolylineValue(
+  //       directionsData.data.routes[0].overview_polyline.points
+  //     );
+  //     return directionsData;
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
   //will set the first or second atom depending on the boolean
   async function getMidwayCoords(userAddress: string, firstSecond: boolean) {

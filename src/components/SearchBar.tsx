@@ -16,6 +16,7 @@ export default function MidwaySearchBars() {
 
   const [firstAddressSet, setFirstAddressSet] = useState<boolean>(false);
   const [secondAddressSet, setSecondAddressSet] = useState<boolean>(false);
+  const [confirmed, setConfirmed] = useState<boolean>(false);
   const [keyword, setKeyword] = useState<string>("");
   const [radius, setRadius] = useState<number>();
   const [encodedPolylineValue, setEncodedPolylineValue] = useState<string>("");
@@ -70,6 +71,7 @@ export default function MidwaySearchBars() {
       })
       .then(() => {
         console.log(midwayCoords, "MIDWAY COORDS");
+        setConfirmed(true);
       });
   };
 
@@ -211,16 +213,19 @@ export default function MidwaySearchBars() {
             {secondAddressSet ? <Checkmark></Checkmark> : null}
           </div>
           <div className="flex items-center justify-center my-2">
-            {!firstAddressSet || !secondAddressSet ? <button
-              className="font-fuzzy-bubbles w-full px-4 py-2 my-0 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
-              onClick={handleDirections}
-            >
-              Confirm Addresses
-            </button> : null}
+            {firstAddressSet && secondAddressSet ? (
+              <button
+                className="font-fuzzy-bubbles px-4 py-2 mx-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 hover:bg-gray-200"
+                onClick={handleDirections}
+              >
+                Confirm Addresses
+              </button>
+            ) : null}
+            {confirmed ? <Checkmark></Checkmark> : null}
           </div>
         </form>
       </div>
-      {firstAddressSet && secondAddressSet ? midwayParams() : null}
+      {confirmed ? midwayParams() : null}
     </>
   );
 }
